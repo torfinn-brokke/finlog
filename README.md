@@ -21,7 +21,7 @@ To install it on Linux, use one of the following three commands depending on whi
 ```bash
 $ sudo apt install sqlite3 # Debian-based distributions (Ubuntu, Linux Mint...)
 $ sudo dnf install sqlite  # Red Hat-based distributions (Fedora, RHEL...)
-$ sudo pacman -S squlite   # Arch Linux
+$ sudo pacman -S sqlite   # Arch Linux
 ```
 
 If you are on another Linux distribution, or using Windows/macOS, consult the relevant documentation for how to install SQLite3.
