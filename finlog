@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# finlog: a Bash script for recording and listing personal expenses in a local
+# SQLite database.
+
+set -uo pipefail
+
+# --- Configuration ---
+
+SCRIPT_NAME="$(basename "$0")"
+readonly SCRIPT_NAME
+
+# --- Helper Functions ---
+
+die() {
+  local msg="$1"
+  local code="${2:-1}"
+  echo "[$SCRIPT_NAME:${BASH_LINENO[0]}] ERROR: $msg" >&2
+  exit "$code"
+}
+
+log() {
+  printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$@" >&2
+}
+
+usage() {
+  echo "$SCRIPT_NAME: usage:"
+  echo "$SCRIPT_NAME [source_directory destination_directory]"
+  echo "  -d  Dry-run mode"
+  echo "  -h  Help"
+}
+
+# --- Cleanup ---
+
+cleanup() {
+  if [[ -n "${TMPFILE:-}" && -f "$TMPFILE" ]]; then
+    rm -f "$TMPFILE"
+    log "Cleaned up temporary file: $TMPFILE"
+  fi
+}
+
+trap cleanup EXIT
+
+# --- Main Logic ---
+
