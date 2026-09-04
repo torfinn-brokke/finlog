@@ -11,7 +11,7 @@ finlog requires SQLite3 to be installed on your system.
 To install it on Linux, use one of the following three commands depending on which Linux distribution you are on:
 
 ```bash
-$ sudo apt install sqlite3 # Debian-based systems (Ubuntu, Linux Mint...)
+$ sudo apt install sqlite3 # Debian-based distributions (Ubuntu, Linux Mint...)
 $ sudo dnf install sqlite  # Red Hat-based distributions (Fedora, RHEL...)
 $ sudo pacman -S squlite   # Arch Linux
 ```
