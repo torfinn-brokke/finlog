@@ -11,7 +11,7 @@ finlog requires SQLite3 to be installed on your system.
 To check whether it is already installed, run the following command:
 
 ```bash
-<strong>$ which sqlite3</strong>
+$ which sqlite3
 ```
 
 If it is already installed, this command will indicate where it is installed, commonly `/usr/bin/sqlite3`. If the command returns nothing, you do not have SQLite3 installed.
@@ -52,7 +52,7 @@ finlog is meant for personal finance tracking through adding expenses to (or del
 
 To add a transaction, use the following format:
 
-```bash
+```shell
 $ finlog add 09.09.2026 534,60 Groceries -n Bread and milk
 Transaction #126 successfully added: 09.09.2026 - kr 534,60 - Groceries - Bread and milk
 $
@@ -60,7 +60,7 @@ $
 
 To delete a transaction, use its transaction number like this:
 
-```bash
+```shell
 $ finlog delete 126
 Transaction #126 (09.09.2026 - kr 534,60 - Groceries - Bread and milk) will be deleted. Are you sure? (y/n) > y
 Transaction #126 successfully deleted.
