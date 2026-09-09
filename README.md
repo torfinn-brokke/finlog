@@ -50,6 +50,8 @@ $ chmod +x ~/bin/finlog
 
 finlog is meant for personal finance tracking through adding expenses to (or deleted from) a database, from where they can be retrieved and listed by date, amount, category and any attached notes. The total expenses per category can also be listed.
 
+> **NOTE:** finlog uses NOK (Norwegian krone) as its currency, and will prefix all amounts with "kr".
+
 To add a transaction, use `finlog add date amount category [-n note]` in the following format:
 
 * The date needs to be in the DD.MM.YYYY format.
@@ -65,12 +67,42 @@ Transaction 126 successfully added: 09.09.2026 - kr 534,60 - Groceries - Bread a
 $
 ```
 
-To delete a transaction, use its transaction number like this:
+To delete a transaction, use `finlog delete transaction_number` like this:
 
 ```bash
 $ finlog delete 126
-Transaction 126 (09.09.2026 - kr 534,60 - Groceries - Bread and milk) will be deleted. Are you sure? (y/n) > y
+Transaction 126 (09.09.2026 - kr 534,60 - Groceries - Bread and milk) will be deleted.
+Are you sure? (y/n) > y
 Transaction 126 successfully deleted.
+$
+```
+
+To list all transactions in the database corresponding to a particular date, amount, category or note, use `finlog list` in the following manner:
+
+```bash
+$ finlog list -d date     # Only the DD.MM.YYYY format is accepted.
+$ finlog list -a amount   # No spaces, comma as decimal separator, a maximum of two decimals.
+$ finlog list -c category # Wildcards are possible.
+$ finlog list -n note     # Wildcards are possible.
+```
+
+Listing transactions will also make finlog display the total amount for all items listed. This can be used to display, for example, the total amount spent on groceries.
+
+> **NOTE:** For the category search to provide correct data, remember to be diligent about using the same spelling for each occurrence of a particular category.
+
+Here is an example lookup:
+
+```bash
+$ finlog list -c Utilities
+  
+  No. | Date       | Amount        | Category            | Note
+---------------------------------------------------------------------------------------
+   14 | 05.08.2026 | kr 1685,43    | Utilities           | Electricity
+   59 | 28.08.2026 | kr 499,00     | Utilities           | Internet
+  102 | 06.09.2026 | kr 560,50     | Utilities           |
+
+TOTAL AMOUNT: kr 2744,93
+
 $
 ```
 
