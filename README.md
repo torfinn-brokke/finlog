@@ -50,20 +50,27 @@ $ chmod +x ~/bin/finlog
 
 finlog is meant for personal finance tracking through adding expenses to (or deleted from) a database, from where they can be retrieved and listed by date, amount, category and any attached notes. The total expenses per category can also be listed.
 
-To add a transaction, use the following format:
+To add a transaction, use `finlog add date amount category [-n note]` in the following format:
 
-```shell
+* The date needs to be in the DD.MM.YYYY format.
+* The amount must contain no spaces and use a comma (`,`) as the decimal separator.
+* The category must be one word, without any whitespace.
+* The optional note can be of any length and contain whitespace.
+
+Here is an example of how to add a transaction, including the optional note:
+
+```bash
 $ finlog add 09.09.2026 534,60 Groceries -n Bread and milk
-Transaction #126 successfully added: 09.09.2026 - kr 534,60 - Groceries - Bread and milk
+Transaction 126 successfully added: 09.09.2026 - kr 534,60 - Groceries - Bread and milk
 $
 ```
 
 To delete a transaction, use its transaction number like this:
 
-```shell
+```bash
 $ finlog delete 126
-Transaction #126 (09.09.2026 - kr 534,60 - Groceries - Bread and milk) will be deleted. Are you sure? (y/n) > y
-Transaction #126 successfully deleted.
+Transaction 126 (09.09.2026 - kr 534,60 - Groceries - Bread and milk) will be deleted. Are you sure? (y/n) > y
+Transaction 126 successfully deleted.
 $
 ```
 
