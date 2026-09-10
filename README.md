@@ -48,14 +48,14 @@ $ chmod +x ~/bin/finlog
 
 ## Usage
 
-finlog is meant for personal finance tracking through adding expenses to (or deleted from) a database, from where they can be retrieved and listed by date, amount, category and any attached notes. The total expenses per category can also be listed.
+finlog is meant for personal finance tracking through adding expenses to (or delete them from) a database, from where they can be retrieved and listed by date, amount, category and any attached notes. The total expenses for the listed items is also displayed.
 
 > **NOTE:** finlog uses NOK (Norwegian krone) as its currency, and will prefix all amounts with "kr".
 
 To add a transaction, use `finlog add date amount category [-n note]` in the following format:
 
 * The date needs to be in the DD.MM.YYYY format.
-* The amount must contain no spaces and use a comma (`,`) as the decimal separator.
+* The amount must contain no spaces and must use a comma (`,`) as the decimal separator.
 * The category must be one word, without any whitespace.
 * The optional note can be of any length and contain whitespace.
 
