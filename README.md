@@ -139,6 +139,7 @@ $ finlog -h
 ## Notes
 
 * This project has mainly served as an exercise during my journey towards mastering Bash scripting.
+* finlog is made for Norwegian standards when it comes to date format, decimal separators and amount prefixes.
 
 ## License
 
