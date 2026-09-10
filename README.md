@@ -127,6 +127,8 @@ TOTAL AMOUNT (ALL CATEGORIES): kr 65758,87
 $
 ```
 
+> **NOTE:** Be careful about spelling the category names the exact same way every time you add a transaction. Otherwise you might end up with, for example, one `Groceries` and one `grocery` category.
+
 For help, use:
 
 ```bash
