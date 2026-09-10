@@ -54,7 +54,7 @@ The first time it is used, finlog will create a SQLite3 database file in the dir
 
 > **NOTE:** finlog uses NOK (Norwegian krone) as its currency, and will prefix all amounts with "kr".
 
-To add a transaction, use `finlog add date amount category [-n note]` in the following format:
+To add a transaction, use `finlog add [date] amount category [-n note]` in the following format:
 
 * The date needs to be in the DD.MM.YYYY format. If no date is entered, today's date will be used automatically.
 * The amount must contain no spaces and must use a comma (`,`) as the decimal separator.
@@ -81,9 +81,10 @@ Transaction 126 successfully deleted.
 $
 ```
 
-To list all transactions in the database corresponding to a particular date, amount, category or note, use `finlog list` in the following manner:
+To list all transactions in the database, or filter the results corresponding to a particular date, amount, category or note, use `finlog list` in the following manner:
 
 ```bash
+$ finlog list             # Lists all transactions added to the database.
 $ finlog list -d date     # Only the DD.MM.YYYY format is accepted. If no date is entered, today's date will be used automatically.
 $ finlog list -a amount   # No spaces, comma as decimal separator, a maximum of two decimals.
 $ finlog list -c category # Wildcards are possible.
