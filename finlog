@@ -23,23 +23,23 @@ log() {
   printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$@" >&2
 }
 
-usage() {
-  echo "$SCRIPT_NAME: usage:"
-  echo "$SCRIPT_NAME [source_directory destination_directory]"
-  echo "  -d  Dry-run mode"
-  echo "  -h  Help"
-}
+# usage() {
+#   echo "$SCRIPT_NAME: usage:"
+#   echo "$SCRIPT_NAME [source_directory destination_directory]"
+#   echo "  -d  Dry-run mode"
+#   echo "  -h  Help"
+# }
 
 # --- Cleanup ---
 
-cleanup() {
-  if [[ -n "${TMPFILE:-}" && -f "$TMPFILE" ]]; then
-    rm -f "$TMPFILE"
-    log "Cleaned up temporary file: $TMPFILE"
-  fi
-}
-
-trap cleanup EXIT
+# cleanup() {
+#   if [[ -n "${TMPFILE:-}" && -f "$TMPFILE" ]]; then
+#     rm -f "$TMPFILE"
+#     log "Cleaned up temporary file: $TMPFILE"
+#   fi
+# }
+# 
+# trap cleanup EXIT
 
 # --- Main Logic ---
 
@@ -57,14 +57,16 @@ fi
 
 if [[ -f $db_path/$db_file ]] \
   && [[ ! -w $db_path/$db_file ]]; then
-  die "unable to read database file $db_path/$db_file."
+  die "unable to write to database file $db_path/$db_file."
 fi
 
 if [[ ! -f $db_path/$db_file ]]; then
-  sqlite3 "$db_file" "CREATE TABLE finlog_data (
-    ref_no INTEGER PRIMARY KEY AUTOINCREMENT,
-    date INTEGER,
+  sqlite3 "$db_path/$db_file" "CREATE TABLE finlog_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT,
     amount INTEGER,
     category TEXT,
-    note TEXT)"
+    note TEXT)" \
+      || die "unable to create database file $db_path/$db_file."
+  log "Database file $db_path/$db_file successfully created."
 fi 
