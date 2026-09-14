@@ -47,26 +47,26 @@ if ! which sqlite3; then
   die "SQLite3 not installed."
 fi
 
-db_path="$HOME/.local/share/finlog"
-db_file="finlog.db"
+DB_PATH="$HOME/.local/share/finlog"
+DB_FILE="finlog.db"
 
-if [[ ! -d $db_path ]]; then
-  mkdir -p "$db_path" \
-    || die "unable to create directory $db_path."
+if [[ ! -d $DB_PATH ]]; then
+  mkdir -p "$DB_PATH" \
+    || die "unable to create directory $DB_PATH."
 fi
 
-if [[ -f $db_path/$db_file ]] \
-  && [[ ! -w $db_path/$db_file ]]; then
-  die "unable to write to database file $db_path/$db_file."
+if [[ -f $DB_PATH/$DB_FILE ]] \
+  && [[ ! -w $DB_PATH/$DB_FILE ]]; then
+  die "unable to write to database file $DB_PATH/$DB_FILE."
 fi
 
-if [[ ! -f $db_path/$db_file ]]; then
-  sqlite3 "$db_path/$db_file" "CREATE TABLE finlog_data (
+if [[ ! -f $DB_PATH/$DB_FILE ]]; then
+  sqlite3 "$DB_PATH/$DB_FILE" "CREATE TABLE finlog_data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     date TEXT,
     amount INTEGER,
     category TEXT,
     note TEXT)" \
-      || die "unable to create database file $db_path/$db_file."
-  log "Database file $db_path/$db_file successfully created."
+      || die "unable to create database file $DB_PATH/$DB_FILE."
+  log "Database file $DB_PATH/$DB_FILE successfully created."
 fi 
