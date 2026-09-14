@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # finlog: a Bash script for recording and listing personal expenses in a local
 # SQLite database.
@@ -43,3 +43,28 @@ trap cleanup EXIT
 
 # --- Main Logic ---
 
+if ! which sqlite3; then
+  die "SQLite3 not installed."
+fi
+
+db_path="$HOME/.local/share/finlog"
+db_file="finlog.db"
+
+if [[ ! -d $db_path ]]; then
+  mkdir -p "$db_path" \
+    || die "unable to create directory $db_path."
+fi
+
+if [[ -f $db_path/$db_file ]] \
+  && [[ ! -w $db_path/$db_file ]]; then
+  die "unable to read database file $db_path/$db_file."
+fi
+
+if [[ ! -f $db_path/$db_file ]]; then
+  sqlite3 "$db_file" "CREATE TABLE finlog_data (
+    ref_no INTEGER PRIMARY KEY AUTOINCREMENT,
+    date INTEGER,
+    amount INTEGER,
+    category TEXT,
+    note TEXT)"
+fi 
