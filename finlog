@@ -80,13 +80,24 @@ if [[ ! -f $DB_PATH/$DB_FILE ]]; then
   log "Database file $DB_PATH/$DB_FILE successfully created."
 fi 
 
-finlog_add=0
-finlog_delete=0
-finlog_list=0
-finlog_summary=0
+finlog_add () {
+  true
+}
+
+finlog_delete () {
+  true
+}
+
+finlog_list () {
+  true
+}
+
+finlog_summary () {
+  true
+}
 
 case "$1" in
-  add)      tx_date="$2"
+  add)      tx_date="$2:-$(date +"%d.%m.%Y")"
             tx_amount="$3"
             tx_category="$4"
             tx_note="$5"
@@ -98,7 +109,7 @@ case "$1" in
   list)     case "$2" in
               all)  # sqlite3 command here
                     ;;
-              -d)   list_date="$3"
+              -d)   list_date="$3:-$(date +"%d.%m.%Y")"
                     ;;
               -a)   list_amount="$3"
                     ;;
