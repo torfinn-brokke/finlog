@@ -102,6 +102,9 @@ finlog_add () {
     date, amount, category, note)
     VALUES ('$tx_date_iso', $tx_amount,'$tx_category','$tx_note')" \
       || die "unable to write to database file $DB_PATH/$DB_FILE."
+  
+  sqlite3 -cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+    "$DB_PATH/$DB_FILE"
 
 }
 
@@ -127,6 +130,7 @@ case "$1" in
               shift
               tx_note="$@"
             done
+            tx_note="${tx_note//\'/\'\'}"
             finlog_add
             ;;
   delete)   tx_id="$2"
