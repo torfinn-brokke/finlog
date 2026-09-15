@@ -43,6 +43,15 @@ log() {
 
 # --- Main Logic ---
 
+while getopts :h opt; do
+  case $opt in
+    h)  usage
+        exit 0
+        ;;
+    \?) die "option '-$optarg' not valid; use '$SCRIPT_NAME -h' for help." ;;
+  esac
+done
+
 if ! which sqlite3; then
   die "SQLite3 not installed."
 fi
@@ -70,3 +79,40 @@ if [[ ! -f $DB_PATH/$DB_FILE ]]; then
       || die "unable to create database file $DB_PATH/$DB_FILE."
   log "Database file $DB_PATH/$DB_FILE successfully created."
 fi 
+
+finlog_add=0
+finlog_delete=0
+finlog_list=0
+finlog_summary=0
+
+case "$1" in
+  add)      tx_date="$2"
+            tx_amount="$3"
+            tx_category="$4"
+            tx_note="$5"
+            finlog_add
+            ;;
+  delete)   tx_id="$2"
+            finlog_delete
+            ;;
+  list)     case "$2" in
+              all)  # sqlite3 command here
+                    ;;
+              -d)   list_date="$3"
+                    ;;
+              -a)   list_amount="$3"
+                    ;;
+              -c)   list_category="$3"
+                    ;;
+              -n)   list_note="$3"
+                    ;;
+              *)    die "invalid argument(s); use '$SCRIPT_NAME -h' for help."
+                    ;;
+            esac
+            finlog_list
+            ;;
+  summary)  finlog_summary
+            ;;
+  *)        die "invalid argument(s); use '$SCRIPT_NAME -h' for help."
+            ;;
+esac
