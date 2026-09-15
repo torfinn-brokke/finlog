@@ -98,6 +98,10 @@ finlog_add () {
     die "invalid category: single word only, alphanumeric characters."
   fi
 
+  if [[ ! $tx_note =~ ^[A-Za-z0-9\ .,!?:/_()]+$ ]]; then
+    die "invalid notes: Only A-Z, a-z, 0-9, space and '.,!?:/_()' allowed."
+  fi
+
   sqlite3 "$DB_PATH/$DB_FILE" "INSERT INTO finlog_data (
     date, amount, category, note)
     VALUES ('$tx_date_iso', $tx_amount,'$tx_category','$tx_note')" \
