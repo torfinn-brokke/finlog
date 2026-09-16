@@ -232,7 +232,7 @@ case "$1" in
                     list_date_iso=$(printf "%s-%s-%s" "$ls_Y" "$ls_m" "$ls_d")
                     ;;
               -a)   list_amount="$3"
-                    ${list_amount//,/}
+                    list_amount="${list_amount//,/}"
                     ;;
               -c)   list_category="$3"
                     ;;
