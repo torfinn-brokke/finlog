@@ -228,8 +228,8 @@ case "$1" in
                     unset list_date
                     list_date="$3:-$(date +"%d.%m.%Y")"
                     set -u
-                    IFS='.' read -r tx_d tx_m tx_Y <<< "$tx_date"
-                    list_date_iso=$(printf "%s-%s-%s" "$tx_Y" "$tx_m" "$tx_d")
+                    IFS='.' read -r ls_d ls_m ls_Y <<< "$tx_date"
+                    list_date_iso=$(printf "%s-%s-%s" "$ls_Y" "$ls_m" "$ls_d")
                     ;;
               -a)   list_amount="$3"
                     ${list_amount//,/}
