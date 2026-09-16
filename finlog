@@ -7,7 +7,8 @@ set -uo pipefail
 
 # --- Configuration ---
 
-readonly SCRIPT_NAME="$(basename "$0")"
+SCRIPT_NAME="$(basename "$0")"
+readonly SCRIPT_NAME
 
 # --- Helper Functions ---
 
@@ -29,17 +30,6 @@ log() {
 #   echo "  -h  Help"
 # }
 
-# --- Cleanup ---
-
-# cleanup() {
-#   if [[ -n "${TMPFILE:-}" && -f "$TMPFILE" ]]; then
-#     rm -f "$TMPFILE"
-#     log "Cleaned up temporary file: $TMPFILE"
-#   fi
-# }
-# 
-# trap cleanup EXIT
-
 # --- Main Logic ---
 
 if (( $# == 0 )); then
@@ -51,7 +41,7 @@ while getopts :h opt; do
     h)  usage
         exit 0
         ;;
-    \?) die "option '-$optarg' not valid; use '$SCRIPT_NAME -h' for help." ;;
+    \?) die "option '-$OPTARG' not valid; use '$SCRIPT_NAME -h' for help." ;;
   esac
 done
 
@@ -84,12 +74,9 @@ if [[ ! -f $DB_PATH/$DB_FILE ]]; then
 fi 
 
 finlog_add () {
-  
-  IFS='.' read -r tx_day tx_month tx_year <<< "$tx_date"
-  tx_date_iso=$(printf "%s-%s-%s" "$tx_year" "$tx_month" "$tx_day")
 
   if [[ ! $tx_date_iso =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
-    && ! date -d "$tx_date_iso" >/dev/null 2>&1; then
+    || ! date -d "$tx_date_iso" >/dev/null 2>&1; then
     die "invalid date; use DD.MM.YYYY."
   fi
 
@@ -135,7 +122,7 @@ finlog_delete () {
     log "Program terminated."
   fi
 
-  sqlite "$DB_PATH/$DB_FILE" "DELETE FROM finlog_data WHERE rowid = $tx_id" \
+  sqlite3 "$DB_PATH/$DB_FILE" "DELETE FROM finlog_data WHERE rowid = $tx_id" \
     || die "unable to delete transaction $tx_id."
 
   log "Transaction $tx_id successfully deleted."
@@ -143,7 +130,58 @@ finlog_delete () {
 }
 
 finlog_list () {
-  true
+  
+  list_date=0
+  list_amount=0
+  list_category=0
+  list_note=0
+
+  if (( list_date != 0 )); then
+
+    if [[ ! $list_date_iso =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
+      || ! date -d "$list_date_iso" >/dev/null 2>&1; then
+      die "invalid date; use DD.MM.YYYY."
+    fi
+  
+    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+      WHERE date LIKE '$list_date'"
+
+  elif (( list_amount != 0 )); then
+  
+    if [[ ! $list_amount =~ ^[0-9]+,?([0-9]{2})?$ ]]; then
+      die "invalid amount; digits only, 0/2 decimals, ',' as decimal separator."
+    fi
+
+    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+      WHERE amount LIKE '$list_amount'"
+
+  elif (( list_category != 0 )); then
+    
+    if [[ ! $list_category =~ ^[[:alnum:]]+$ ]]; then
+      die "invalid category: single word only, alphanumeric characters."
+    fi
+
+    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+      WHERE category LIKE '$list_category'"
+
+  elif (( list_note != 0 )); then
+    if [[ ! $list_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]]; then
+      die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
+    fi
+
+    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+      WHERE note LIKE '$list_note'"
+
+  else
+    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data"
+
+fi
+
 }
 
 finlog_summary () {
@@ -151,11 +189,14 @@ finlog_summary () {
 }
 
 case "$1" in
-  add)      if [[ $1 =~ ^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$ ]]; then
+  add)      if [[ $2 =~ ^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$ ]]; then
               while [[ $# -gt 0 ]]; do 
                 tx_date="$2:-$(date +"%d.%m.%Y")"
+                IFS='.' read -r tx_d tx_m tx_Y <<< "$tx_date"
+                tx_date_iso=$(printf "%s-%s-%s" "$tx_Y" "$tx_m" "$tx_d")
                 shift
                 tx_amount="$2"
+                ${tx_amount//,/} 
                 shift
                 tx_category="$2"
                 shift
@@ -179,9 +220,15 @@ case "$1" in
   list)     case "$2" in
               all)  # sqlite3 command here
                     ;;
-              -d)   list_date="$3:-$(date +"%d.%m.%Y")"
+              -d)   set +u
+                    unset list_date
+                    list_date="$3:-$(date +"%d.%m.%Y")"
+                    set -u
+                    IFS='.' read -r tx_d tx_m tx_Y <<< "$tx_date"
+                    list_date_iso=$(printf "%s-%s-%s" "$tx_Y" "$tx_m" "$tx_d")
                     ;;
               -a)   list_amount="$3"
+                    ${list_amount//,/}
                     ;;
               -c)   list_category="$3"
                     ;;
