@@ -133,12 +133,18 @@ finlog_delete () {
 
 finlog_list () {
   
+  list_all=0
   list_date=0
   list_amount=0
   list_category=0
   list_note=0
 
-  if (( list_date != 0 )); then
+  if (( list_all == 1 )); then
+
+    sqlite3 "$SQLITE_CONFIG" \
+      "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data"
+
+  elif (( list_date != 0 )); then
 
     if [[ ! $list_date_iso =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
       || ! date -d "$list_date_iso" >/dev/null 2>&1; then
@@ -178,10 +184,6 @@ finlog_list () {
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE note LIKE '$list_note'"
 
-  else
-    sqlite3 "$SQLITE_CONFIG" \
-      "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data"
-
 fi
 
 }
@@ -220,7 +222,7 @@ case "$1" in
             finlog_delete
             ;;
   list)     case "$2" in
-              all)  # sqlite3 command here
+              all)  list_all=1
                     ;;
               -d)   set +u
                     unset list_date
