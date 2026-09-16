@@ -43,6 +43,10 @@ log() {
 
 # --- Main Logic ---
 
+if (( $# == 0 )); then
+  die "missing arguments/options; use '$SCRIPT_NAME -h' for help."
+fi
+
 while getopts :h opt; do
   case $opt in
     h)  usage
@@ -98,8 +102,8 @@ finlog_add () {
     die "invalid category: single word only, alphanumeric characters."
   fi
 
-  if [[ ! $tx_note =~ ^[A-Za-z0-9\ .,!?:/_()]+$ ]]; then
-    die "invalid notes: Only A-Z, a-z, 0-9, space and '.,!?:/_()' allowed."
+  if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]]; then
+    die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
   fi
 
   sqlite3 "$DB_PATH/$DB_FILE" "INSERT INTO finlog_data (
@@ -107,13 +111,36 @@ finlog_add () {
     VALUES ('$tx_date_iso', $tx_amount,'$tx_category','$tx_note')" \
       || die "unable to write to database file $DB_PATH/$DB_FILE."
   
+  log "Transaction successfully added:"
+
   sqlite3 -cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
-    "$DB_PATH/$DB_FILE"
+    "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+    WHERE rowid = last_insert_rowid()"
 
 }
 
 finlog_delete () {
-  true
+
+  if [[ ! $tx_id =~ ^[0-9]+$ ]]; then
+    die "invalid transaction number; digits only, no spaces."
+  fi
+
+  printf "%s\n\n" "The following transaction will be deleted:"
+  sqlite3 -cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+    "$DB_PATH/$DB_FILE" "SELECT * FROM finlog data
+    WHERE rowid = $tx_id"
+  printf "\n"
+  read -rp "Are you sure? (y/n) > "
+
+  if [[ ! $REPLY =~ ^[yY]$ ]]; then
+    log "Program terminated."
+  fi
+
+  sqlite "$DB_PATH/$DB_FILE" "DELETE FROM finlog_data WHERE rowid = $tx_id" \
+    || die "unable to delete transaction $tx_id."
+
+  log "Transaction $tx_id successfully deleted."
+
 }
 
 finlog_list () {
@@ -132,7 +159,7 @@ case "$1" in
               shift
               tx_category="$2"
               shift
-              tx_note="$@"
+              tx_note="$*"
             done
             tx_note="${tx_note//\'/\'\'}"
             finlog_add
