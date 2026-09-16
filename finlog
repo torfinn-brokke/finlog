@@ -51,6 +51,8 @@ fi
 
 readonly DB_PATH="$HOME/.local/share/finlog"
 readonly DB_FILE="finlog.db"
+readonly SQLITE_CONFIG="-cmd \".header on\" -cmd \".mode box\" \
+  -cmd \".width -10 10 10 40 60\""
 
 if [[ ! -d $DB_PATH ]]; then
   mkdir -p "$DB_PATH" \
@@ -99,7 +101,7 @@ finlog_add () {
   
   log "Transaction successfully added:"
 
-  sqlite3 -cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+  sqlite3 "$SQLITE_CONFIG" \
     "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
     WHERE rowid = last_insert_rowid()"
 
@@ -112,7 +114,7 @@ finlog_delete () {
   fi
 
   printf "%s\n\n" "The following transaction will be deleted:"
-  sqlite3 -cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
+  sqlite3 "$SQLITE_CONFIG" \
     "$DB_PATH/$DB_FILE" "SELECT * FROM finlog data
     WHERE rowid = $tx_id"
   printf "\n"
@@ -143,8 +145,8 @@ finlog_list () {
       die "invalid date; use DD.MM.YYYY."
     fi
   
-    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
-      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+    sqlite3 "$SQLITE_CONFIG" \
+      "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE date LIKE '$list_date'"
 
   elif (( list_amount != 0 )); then
@@ -153,8 +155,8 @@ finlog_list () {
       die "invalid amount; digits only, 0/2 decimals, ',' as decimal separator."
     fi
 
-    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
-      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+    sqlite3 "$SQLITE_CONFIG" \
+      "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE amount LIKE '$list_amount'"
 
   elif (( list_category != 0 )); then
@@ -163,8 +165,8 @@ finlog_list () {
       die "invalid category: single word only, alphanumeric characters."
     fi
 
-    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
-      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+    sqlite3 "$SQLITE_CONFIG" \
+      "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE category LIKE '$list_category'"
 
   elif (( list_note != 0 )); then
@@ -172,13 +174,13 @@ finlog_list () {
       die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
     fi
 
-    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
-      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
+    sqlite3 "$SQLITE_CONFIG" \
+      "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE note LIKE '$list_note'"
 
   else
-    sqlite3 "-cmd ".header on" -cmd ".mode box" -cmd ".width -10 10 10 40 60" \
-      $DB_PATH/$DB_FILE" "SELECT * FROM finlog_data"
+    sqlite3 "$SQLITE_CONFIG" \
+      "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data"
 
 fi
 
