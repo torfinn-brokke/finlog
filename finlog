@@ -7,8 +7,7 @@ set -uo pipefail
 
 # --- Configuration ---
 
-SCRIPT_NAME="$(basename "$0")"
-readonly SCRIPT_NAME
+readonly SCRIPT_NAME="$(basename "$0")"
 
 # --- Helper Functions ---
 
@@ -60,8 +59,8 @@ if ! which sqlite3; then
   die "SQLite3 not installed."
 fi
 
-DB_PATH="$HOME/.local/share/finlog"
-DB_FILE="finlog.db"
+readonly DB_PATH="$HOME/.local/share/finlog"
+readonly DB_FILE="finlog.db"
 
 if [[ ! -d $DB_PATH ]]; then
   mkdir -p "$DB_PATH" \
