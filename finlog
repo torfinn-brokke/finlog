@@ -82,8 +82,11 @@ fi
 
 readonly DB_PATH="$HOME/.local/share/finlog"
 readonly DB_FILE="finlog.db"
-readonly SQLITE_CONFIG="-cmd \".header on\" -cmd \".mode box\" \
-  -cmd \".width -10 10 10 40 60\""
+readonly SQLITE_CONFIG=(
+  -cmd ".header on"
+  -cmd ".mode box"
+  -cmd ".width -10 10 10 40 60"
+)
 
 # --- Working Directory and Database File Checks ---
 
@@ -128,7 +131,7 @@ finlog_add () {
   
   log "Transaction successfully added:"
 
-  sqlite3 "$SQLITE_CONFIG" \
+  sqlite3 "${SQLITE_CONFIG[@]}" \
     "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
     WHERE rowid = last_insert_rowid()"
 
@@ -137,7 +140,7 @@ finlog_add () {
 finlog_delete () {
 
   printf "%s\n\n" "The following transaction will be deleted:"
-  sqlite3 "$SQLITE_CONFIG" \
+  sqlite3 "${SQLITE_CONFIG[@]}" \
     "$DB_PATH/$DB_FILE" "SELECT * FROM finlog data
     WHERE rowid = $tx_id"
   printf "\n"
@@ -164,34 +167,34 @@ finlog_list () {
   
   if (( list_all == 1 )); then
 
-    sqlite3 "$SQLITE_CONFIG" \
+    sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data"
 
   elif (( list_date == 1 )); then
 
     validate_date
-    sqlite3 "$SQLITE_CONFIG" \
+    sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE date LIKE '$list_date'"
 
   elif (( list_amount == 1 )); then
   
     validate_amount
-    sqlite3 "$SQLITE_CONFIG" \
+    sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE amount LIKE '$list_amount'"
 
   elif (( list_category == 1 )); then
     
     validate_category
-    sqlite3 "$SQLITE_CONFIG" \
+    sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE category LIKE '$list_category'"
 
   elif (( list_note == 1 )); then
 
     validate_note
-    sqlite3 "$SQLITE_CONFIG" \
+    sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE note LIKE '$list_note'"
 
@@ -201,7 +204,7 @@ finlog_list () {
 
 finlog_summary () {
   
-  sqlite3 "$SQLITE_CONFIG" \
+  sqlite3 "${SQLITE_CONFIG[@]}" \
     "$DB_PATH/$DB_FILE" "SELECT category, sum(amount) FROM finlog_data
     GROUP BY category"
 
@@ -222,7 +225,8 @@ validate_amount () {
   if [[ ! $tx_amount =~ ^[0-9]+,?([0-9]{2})?$ ]]; then
     die "invalid amount; digits only, 0/2 decimals, ',' as decimal separator."
   fi
-  ${tx_amount//,/} 
+  tx_amount=${tx_amount//,/.} 
+  tx_amount=$(awk -v amt="$tx_amount" 'BEGIN { printf "%.0f", amt * 100 }')
 }
 
 validate_category () {
@@ -232,7 +236,8 @@ validate_category () {
 }
 
 validate_note () {
-  if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]]; then
+  tx_note="${tx_note:-}"
+  if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]] && [[ ! -z $tx_note ]]; then
     die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
   fi
 }
@@ -246,25 +251,23 @@ validate_tx_id () {
 # --- Argument/Option Parsing ---
 
 case "$1" in
-  add)      if [[ $2 =~ ^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$ ]]; then
-              tx_date="$2"
-              tx_amount="$3"
-              tx_category="$4"
-              shift 4
-              if [[ $5 =~ -n ]]; then
+  add)      shift
+            tx_data=("$@")
+            if [[ ${tx_data[0]} =~ ^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$ ]]; then
+              tx_date="${tx_data[0]}"
+              tx_amount="${tx_data[1]}"
+              tx_category="${tx_data[2]}"
+              if (( ${#tx_data[@]} >= 4 )) && [[ ${tx_data[3]} == -n ]]; then
                 add_note=1
-                shift
-                tx_note="$*"
+                tx_note="${tx_data[*]:4}"
               fi
             else
               tx_date=$(date +"%d.%m.%Y")
-              tx_amount="$2"
-              tx_category="$3"
-              shift 3
-              if [[ $4 =~ -n ]]; then
+              tx_amount="${tx_data[0]}"
+              tx_category="${tx_data[1]}"
+              if (( ${#tx_data[@]} >= 3 )) && [[ ${tx_data[2]} == -n ]]; then
                 add_note=1
-                shift
-                tx_note="$*"
+                tx_note="${tx_data[*]:3}"
               fi
             fi
             validate_date
