@@ -262,7 +262,6 @@ case "$1" in
             ;;
   list)     case "$2" in
               all)  list_all=1
-                    finlog_list
                     ;;
               -d)   list_date=1
                     tx_date="$3"
