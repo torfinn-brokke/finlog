@@ -85,7 +85,14 @@ readonly DB_FILE="finlog.db"
 readonly SQLITE_CONFIG=(
   -cmd ".header on"
   -cmd ".mode box"
-  -cmd ".width -10 10 10 40 60"
+  -cmd ".width 3 10 -12 16 29"
+)
+readonly SQLITE_OUTPUT_FORMAT=(
+    'id AS ID,'
+    'date AS Date,'
+    "'kr ' || printf('%d,%02d', amount / 100, amount % 100) AS Amount,"
+    'category AS Category,'
+    'note AS Note'
 )
 
 # --- Working Directory and Database File Checks ---
@@ -168,7 +175,7 @@ finlog_list () {
   if (( list_all == 1 )); then
 
     sqlite3 "${SQLITE_CONFIG[@]}" \
-      "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data"
+      "$DB_PATH/$DB_FILE" "SELECT ${SQLITE_OUTPUT_FORMAT[*]} FROM finlog_data"
 
   elif (( list_date == 1 )); then
 
