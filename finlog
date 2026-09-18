@@ -112,26 +112,9 @@ fi
 
 finlog_add () {
 
-  if [[ ! $tx_date_iso =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
-    || ! date -d "$tx_date_iso" >/dev/null 2>&1; then
-    die "invalid date; use DD.MM.YYYY."
-  fi
-
-  if [[ ! $tx_amount =~ ^[0-9]+$ ]]; then
-    die "invalid amount; digits only, 0/2 decimals, ',' as decimal separator."
-  fi
-
-  if [[ ! $tx_category =~ ^[[:alnum:]]+$ ]]; then
-    die "invalid category: single word only, alphanumeric characters."
-  fi
-
-  if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]]; then
-    die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
-  fi
-
   sqlite3 "$DB_PATH/$DB_FILE" "INSERT INTO finlog_data (
     date, amount, category, note)
-    VALUES ('$tx_date_iso', $tx_amount,'$tx_category','$tx_note')" \
+    VALUES ('$tx_date', $tx_amount,'$tx_category','$tx_note')" \
       || die "unable to write to database file $DB_PATH/$DB_FILE."
   
   log "Transaction successfully added:"
@@ -143,10 +126,6 @@ finlog_add () {
 }
 
 finlog_delete () {
-
-  if [[ ! $tx_id =~ ^[0-9]+$ ]]; then
-    die "invalid transaction number; digits only, no spaces."
-  fi
 
   printf "%s\n\n" "The following transaction will be deleted:"
   sqlite3 "$SQLITE_CONFIG" \
@@ -168,53 +147,41 @@ finlog_delete () {
 
 finlog_list () {
   
-  local list_all=0
-  local list_date=0
-  local list_amount=0
-  local list_category=0
-  local list_note=0
+  list_all=0
+  list_date=0
+  list_amount=0
+  list_category=0
+  list_note=0
 
   if (( list_all == 1 )); then
 
     sqlite3 "$SQLITE_CONFIG" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data"
 
-  elif (( list_date != 0 )); then
+  elif (( list_date == 1 )); then
 
-    if [[ ! $list_date_iso =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
-      || ! date -d "$list_date_iso" >/dev/null 2>&1; then
-      die "invalid date; use DD.MM.YYYY."
-    fi
-  
+    validate_date
     sqlite3 "$SQLITE_CONFIG" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE date LIKE '$list_date'"
 
-  elif (( list_amount != 0 )); then
+  elif (( list_amount == 1 )); then
   
-    if [[ ! $list_amount =~ ^[0-9]+$ ]]; then
-      die "invalid amount; digits only, 0/2 decimals, ',' as decimal separator."
-    fi
-
+    validate_amount
     sqlite3 "$SQLITE_CONFIG" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE amount LIKE '$list_amount'"
 
-  elif (( list_category != 0 )); then
+  elif (( list_category == 1 )); then
     
-    if [[ ! $list_category =~ ^[[:alnum:]]+$ ]]; then
-      die "invalid category: single word only, alphanumeric characters."
-    fi
-
+    validate_category
     sqlite3 "$SQLITE_CONFIG" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE category LIKE '$list_category'"
 
-  elif (( list_note != 0 )); then
-    if [[ ! $list_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]]; then
-      die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
-    fi
+  elif (( list_note == 1 )); then
 
+    validate_note
     sqlite3 "$SQLITE_CONFIG" \
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE note LIKE '$list_note'"
@@ -231,65 +198,88 @@ finlog_summary () {
 
 }
 
+# --- User Input Validation and Conversion ---
+
+validate_date () {
+  IFS='.' read -r tx_d tx_m tx_Y <<< "$tx_date"
+  tx_date=$(printf "%s-%s-%s" "$tx_Y" "$tx_m" "$tx_d")
+  if [[ ! $tx_date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
+    || ! date -d "$tx_date" >/dev/null 2>&1; then
+      die "invalid date; use DD.MM.YYYY."
+  fi
+}
+
+validate_amount () {
+  if [[ ! $tx_amount =~ ^[0-9]+,?([0-9]{2})?$ ]]; then
+    die "invalid amount; digits only, 0/2 decimals, ',' as decimal separator."
+  fi
+  ${tx_amount//,/} 
+}
+
+validate_category () {
+  if [[ ! $tx_category =~ ^[[:alnum:]]+$ ]]; then
+    die "invalid category: single word only, alphanumeric characters."
+  fi
+}
+
+validate_note () {
+  if [[ ! $list_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]]; then
+    die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
+  fi
+}
+
+validate_tx_id () {
+  if [[ ! $tx_id =~ ^[0-9]+$ ]]; then
+    die "invalid transaction number; digits only, no spaces."
+  fi
+}
+
 # --- Argument/Option Parsing ---
 
 case "$1" in
   add)      if [[ $2 =~ ^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$ ]]; then
-              while [[ $# -gt 0 ]]; do 
-                tx_date="$2:-$(date +"%d.%m.%Y")"
-                IFS='.' read -r tx_d tx_m tx_Y <<< "$tx_date"
-                tx_date_iso=$(printf "%s-%s-%s" "$tx_Y" "$tx_m" "$tx_d")
-                shift
-                tx_amount="$2"
-                if [[ ! $tx_amount =~ ^[0-9]+,?([0-9]{2})?$ ]]; then
-                  die "invalid amount; digits only, 0/2 decimals, \
-                    ',' as decimal separator."
-                fi
-                ${tx_amount//,/} 
-                shift
-                tx_category="$2"
-                shift
-                tx_note="$*"
-              done
+              tx_date="$2"
+              tx_amount="$3"
+              tx_category="$4"
+              shift 4
+              tx_note="$*"
             else
-              while [[ $# -gt 0 ]]; do 
-                tx_amount="$2"
-                if [[ ! $tx_amount =~ ^[0-9]+,?([0-9]{2})?$ ]]; then
-                  die "invalid amount; digits only, 0/2 decimals, \
-                    ',' as decimal separator."
-                fi
-                shift
-                tx_category="$2"
-                shift
-                tx_note="$*"
-              done
+              tx_date=$(date +"%d.%m.%Y")
+              tx_amount="$2"
+              tx_category="$3"
+              shift 3
+              tx_note="$*"
             fi
-            tx_note="${tx_note//\'/\'\'}"
+            validate_date
+            validate_amount
+            validate_category
+            validate_note 
             finlog_add
             ;;
   delete)   tx_id="$2"
+            validate_tx_id
             finlog_delete
             ;;
   list)     case "$2" in
               all)  list_all=1
+                    finlog_list
                     ;;
-              -d)   set +u
-                    unset list_date
-                    list_date="$3:-$(date +"%d.%m.%Y")"
-                    set -u
-                    IFS='.' read -r ls_d ls_m ls_Y <<< "$tx_date"
-                    list_date_iso=$(printf "%s-%s-%s" "$ls_Y" "$ls_m" "$ls_d")
+              -d)   list_date=1
+                    tx_date="$3"
+                    validate_date
                     ;;
-              -a)   list_amount="$3"
-                    if [[ ! $list_amount =~ ^[0-9]+,?([0-9]{2})?$ ]]; then
-                      die "invalid amount; digits only, 0/2 decimals, \
-                        ',' as decimal separator."
-                    fi
-                    list_amount="${list_amount//,/}"
+              -a)   list_amount=1
+                    tx_amount="$3"
+                    validate_amount
                     ;;
-              -c)   list_category="$3"
+              -c)   list_category=1
+                    tx_category="$3"
+                    validate_category
                     ;;
-              -n)   list_note="$3"
+              -n)   list_note=1
+                    shift 2
+                    tx_note="$*"
+                    validate_note
                     ;;
               *)    die "invalid argument(s); use '$SCRIPT_NAME -h' for help."
                     ;;
