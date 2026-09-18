@@ -30,29 +30,30 @@ log() {
 #   echo "  -h  Help"
 # }
 
-# --- Main Logic ---
+# =============================================================================
+# Main Logic
+# =============================================================================
+
+# --- Initial Input Validation ---
 
 if (( $# == 0 )); then
   die "missing arguments/options; use '$SCRIPT_NAME -h' for help."
 fi
 
-while getopts :h opt; do
-  case $opt in
-    h)  usage
-        exit 0
-        ;;
-    \?) die "option '-$OPTARG' not valid; use '$SCRIPT_NAME -h' for help." ;;
-  esac
-done
+# --- Dependency Check ---
 
 if ! which sqlite3; then
   die "SQLite3 not installed."
 fi
 
+# --- Configuration Parameters for Main Logic ---
+
 readonly DB_PATH="$HOME/.local/share/finlog"
 readonly DB_FILE="finlog.db"
 readonly SQLITE_CONFIG="-cmd \".header on\" -cmd \".mode box\" \
   -cmd \".width -10 10 10 40 60\""
+
+# --- Working Directory and Database File Checks ---
 
 if [[ ! -d $DB_PATH ]]; then
   mkdir -p "$DB_PATH" \
@@ -74,6 +75,8 @@ if [[ ! -f $DB_PATH/$DB_FILE ]]; then
       || die "unable to create database file $DB_PATH/$DB_FILE."
   log "Database file $DB_PATH/$DB_FILE successfully created."
 fi 
+
+# --- SQLite Functions ---
 
 finlog_add () {
 
@@ -133,11 +136,11 @@ finlog_delete () {
 
 finlog_list () {
   
-  list_all=0
-  list_date=0
-  list_amount=0
-  list_category=0
-  list_note=0
+  local list_all=0
+  local list_date=0
+  local list_amount=0
+  local list_category=0
+  local list_note=0
 
   if (( list_all == 1 )); then
 
@@ -184,7 +187,7 @@ finlog_list () {
       "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
       WHERE note LIKE '$list_note'"
 
-fi
+  fi
 
 }
 
@@ -192,7 +195,12 @@ finlog_summary () {
   true
 }
 
+# --- Argument/Option Parsing ---
+
 case "$1" in
+  -h)       usage
+            exit 0
+            ;;
   add)      if [[ $2 =~ ^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$ ]]; then
               while [[ $# -gt 0 ]]; do 
                 tx_date="$2:-$(date +"%d.%m.%Y")"
