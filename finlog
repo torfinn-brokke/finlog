@@ -54,10 +54,23 @@ fi
 
 while getopts :h opt; do
   case $opt in
-    h) usage
-       exit 0
+    h)  usage
+        exit 0
+        ;;
+    \?) die "option '-$OPTARG' not valid; use 'finlog -h' for help."
+        ;;
   esac
 done
+
+# --- Exit on Invalid Argument ---
+
+case $1 in
+  add|delete|list|summary)  
+    ;;
+  *)
+    die "argument '$1' not valid; use 'finlog -h' for help."
+    ;;
+esac
 
 # --- Dependency Check ---
 
