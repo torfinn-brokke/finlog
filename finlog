@@ -110,12 +110,21 @@ fi
 
 # --- SQLite Functions ---
 
+add_note=0
+
 finlog_add () {
 
-  sqlite3 "$DB_PATH/$DB_FILE" "INSERT INTO finlog_data (
+  if [[ $add_note == 0 ]]; then
+    sqlite3 "$DB_PATH/$DB_FILE" "INSERT INTO finlog_data (
+    date, amount, category)
+    VALUES ('$tx_date', $tx_amount,'$tx_category')" \
+      || die "unable to write to database file $DB_PATH/$DB_FILE."
+  else
+    sqlite3 "$DB_PATH/$DB_FILE" "INSERT INTO finlog_data (
     date, amount, category, note)
     VALUES ('$tx_date', $tx_amount,'$tx_category','$tx_note')" \
       || die "unable to write to database file $DB_PATH/$DB_FILE."
+  fi
   
   log "Transaction successfully added:"
 
@@ -145,14 +154,14 @@ finlog_delete () {
 
 }
 
+list_all=0
+list_date=0
+list_amount=0
+list_category=0
+list_note=0
+
 finlog_list () {
   
-  list_all=0
-  list_date=0
-  list_amount=0
-  list_category=0
-  list_note=0
-
   if (( list_all == 1 )); then
 
     sqlite3 "$SQLITE_CONFIG" \
@@ -242,13 +251,21 @@ case "$1" in
               tx_amount="$3"
               tx_category="$4"
               shift 4
-              tx_note="$*"
+              if [[ $5 =~ -n ]]; then
+                add_note=1
+                shift
+                tx_note="$*"
+              fi
             else
               tx_date=$(date +"%d.%m.%Y")
               tx_amount="$2"
               tx_category="$3"
               shift 3
-              tx_note="$*"
+              if [[ $4 =~ -n ]]; then
+                add_note=1
+                shift
+                tx_note="$*"
+              fi
             fi
             validate_date
             validate_amount
