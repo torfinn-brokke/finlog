@@ -133,7 +133,7 @@ finlog_add () {
 
   sqlite3 "${SQLITE_CONFIG[@]}" \
     "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
-    WHERE rowid = last_insert_rowid()"
+    WHERE id = (SELECT MAX(id) FROM finlog_data)"
 
 }
 
@@ -237,7 +237,7 @@ validate_category () {
 
 validate_note () {
   tx_note="${tx_note:-}"
-  if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]] && [[ ! -z $tx_note ]]; then
+  if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]] && [[ -n $tx_note ]]; then
     die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
   fi
 }
