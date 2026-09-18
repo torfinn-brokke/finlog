@@ -74,7 +74,7 @@ esac
 
 # --- Dependency Check ---
 
-if ! which sqlite3; then
+if ! which sqlite3 >&2 >/dev/null; then
   die "SQLite3 not installed."
 fi
 
@@ -223,7 +223,7 @@ validate_category () {
 }
 
 validate_note () {
-  if [[ ! $list_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]]; then
+  if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]]; then
     die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
   fi
 }
