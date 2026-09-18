@@ -192,7 +192,11 @@ finlog_list () {
 }
 
 finlog_summary () {
-  true
+  
+  sqlite3 "$SQLITE_CONFIG" \
+    "$DB_PATH/$DB_FILE" "SELECT category, sum(amount) FROM finlog_data
+    GROUP BY category"
+
 }
 
 # --- Argument/Option Parsing ---
