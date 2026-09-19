@@ -160,8 +160,7 @@ finlog_delete () {
   read -rp "Are you sure? (y/n) > "
 
   if [[ ! $REPLY =~ ^[yY]$ ]]; then
-    log "Program terminated."
-    exit 1
+    die "program terminated by user."
   fi
 
   sqlite3 "$DB_PATH/$DB_FILE" "DELETE FROM finlog_data WHERE rowid = $tx_id" \
