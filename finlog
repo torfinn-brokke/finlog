@@ -144,15 +144,24 @@ finlog_add () {
 
 finlog_delete () {
 
-  printf "%s\n\n" "The following transaction will be deleted:"
-  sqlite3 "${SQLITE_CONFIG[@]}" \
-    "$DB_PATH/$DB_FILE" "SELECT * FROM finlog data
+  delete_tx () {
+    sqlite3 "${SQLITE_CONFIG[@]}" \
+    "$DB_PATH/$DB_FILE" "SELECT * FROM finlog_data
     WHERE rowid = $tx_id"
+  }
+
+  if [[ -z $(delete_tx) ]]; then
+    die "transaction $tx_id does not exist."
+  fi
+
+  printf "%s\n\n" "The following transaction will be deleted:"
+  delete_tx
   printf "\n"
   read -rp "Are you sure? (y/n) > "
 
   if [[ ! $REPLY =~ ^[yY]$ ]]; then
     log "Program terminated."
+    exit 1
   fi
 
   sqlite3 "$DB_PATH/$DB_FILE" "DELETE FROM finlog_data WHERE rowid = $tx_id" \
