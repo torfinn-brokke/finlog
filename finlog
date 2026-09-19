@@ -236,14 +236,14 @@ validate_amount () {
 
 validate_category () {
   if [[ ! $tx_category =~ ^[[:alnum:]]+$ ]]; then
-    die "invalid category: single word only, alphanumeric characters."
+    die "invalid category; single word only, alphanumeric characters."
   fi
 }
 
 validate_note () {
   tx_note="${tx_note:-}"
   if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]] && [[ -n $tx_note ]]; then
-    die "invalid notes: Only alphanumerics, space and '.,!?:/_()' allowed."
+    die "invalid note; Only alphanumerics, space and '.,!?:/_()' allowed."
   fi
 }
 
