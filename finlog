@@ -188,28 +188,28 @@ finlog_list () {
     validate_date
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-      WHERE date LIKE '$list_date'"
+      WHERE date LIKE '$tx_date'"
 
   elif (( list_amount == 1 )); then
   
     validate_amount
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-      WHERE amount LIKE '$list_amount'"
+      WHERE amount LIKE '$tx_amount'"
 
   elif (( list_category == 1 )); then
     
     validate_category
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-      WHERE category LIKE '$list_category'"
+      WHERE category LIKE '$tx_category'"
 
   elif (( list_note == 1 )); then
 
     validate_note
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-      WHERE note LIKE '$list_note'"
+      WHERE note LIKE '$tx_note'"
 
   fi
 
