@@ -54,7 +54,7 @@ fi
 # --- Check for Help Request ---
 
 while getopts :h opt; do
-  case $opt in
+  case "$opt" in
     h)  usage
         exit 0
         ;;
@@ -65,7 +65,7 @@ done
 
 # --- Exit on Invalid Argument ---
 
-case $1 in
+case "$1" in
   add|delete|list|summary)  
     ;;
   *)
@@ -187,9 +187,9 @@ finlog_list () {
   sum_validation () {
 
     local sum_total
-    sum_total=$(sqlite3 "$DB_PATH/$DB_FILE" "SELECT 'kr ' || printf('%d,%02d',
+    sum_total="$(sqlite3 "$DB_PATH/$DB_FILE" "SELECT 'kr ' || printf('%d,%02d',
     SUM(amount) / 100, SUM(amount) % 100) FROM finlog_data WHERE $1
-    LIKE '$2'")
+    LIKE '$2'")"
   
     if [[ $sum_total = 'kr 0,00' ]]; then
       die "no matching transactions."
@@ -256,8 +256,8 @@ finlog_summary () {
     SUM(amount) / 100, SUM(amount) % 100) AS Total FROM finlog_data
     GROUP BY category"
   
-  sum_total=$(sqlite3 "$DB_PATH/$DB_FILE" "SELECT 'kr ' ||
-  printf('%d,%02d', SUM(amount) / 100, SUM(amount) % 100) FROM finlog_data")
+  sum_total="$(sqlite3 "$DB_PATH/$DB_FILE" "SELECT 'kr ' ||
+  printf('%d,%02d', SUM(amount) / 100, SUM(amount) % 100) FROM finlog_data")"
   
   if [[ $sum_total = 'kr 0,00' ]]; then
     die "no transactions in database."
@@ -273,7 +273,7 @@ finlog_summary () {
 
 validate_date () {
   IFS='.' read -r tx_d tx_m tx_Y <<< "$tx_date"
-  tx_date=$(printf "%s-%s-%s" "$tx_Y" "$tx_m" "$tx_d")
+  tx_date="$(printf "%s-%s-%s" "$tx_Y" "$tx_m" "$tx_d")"
   if [[ ! $tx_date =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
     || ! date -d "$tx_date" >/dev/null 2>&1; then
       die "invalid date; use DD.MM.YYYY."
@@ -286,8 +286,8 @@ validate_amount () {
   elif (( tx_amount == 0 )); then
     die "invalid amount: zero."
   fi
-  tx_amount=${tx_amount//,/.} 
-  tx_amount=$(awk -v amt="$tx_amount" 'BEGIN { printf "%.0f", amt * 100 }')
+  tx_amount="${tx_amount//,/.}"
+  tx_amount="$(awk -v amt="$tx_amount" 'BEGIN { printf "%.0f", amt * 100 }')"
 }
 
 validate_category () {
@@ -346,7 +346,7 @@ case "$1" in
                 tx_note="${tx_data[*]:4}"
               fi
             elif [[ ${tx_data[0]} =~ ^[0-9]+,?([0-9]{2})?$ ]]; then
-              tx_date=$(date +"%d.%m.%Y")
+              tx_date="$(date +"%d.%m.%Y")"
               tx_amount="${tx_data[0]}"
               tx_category="${tx_data[1]}"
               if (( ${#tx_data[@]} >= 3 )) && [[ ${tx_data[2]} == -n ]]; then
