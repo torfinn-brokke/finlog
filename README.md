@@ -82,7 +82,7 @@ $
 To delete a transaction, use `finlog delete transaction_number` like this:
 
 ```bash
-$ finlog delete 5
+$ finlog delete 6
 
 The following transaction will be deleted:
 
@@ -102,7 +102,7 @@ $
 To list all transactions in the database, or filter the results corresponding to a particular date, amount, category or note, use `finlog list` in the following manner:
 
 ```bash
-$ finlog list             # Lists all transactions added to the database.
+$ finlog list all         # Lists all transactions added to the database.
 $ finlog list -d [date]   # Only the DD.MM.YYYY format is accepted (no date input = today).
 $ finlog list -a amount   # No spaces, comma as decimal separator, a maximum of two decimals.
 $ finlog list -c category # Wildcards: '%' matches multiple chars, '_' matches one char.
