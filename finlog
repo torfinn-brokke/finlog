@@ -135,11 +135,14 @@ finlog_add () {
       || die "unable to write to database file $DB_PATH/$DB_FILE."
   fi
   
+  printf "\n" 
   log "Transaction successfully added:"
-
+  
+  printf "\n"
   sqlite3 "${SQLITE_CONFIG[@]}" \
     "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
     WHERE id = (SELECT MAX(id) FROM finlog_data)"
+  printf "\n"
 
 }
 
@@ -155,7 +158,7 @@ finlog_delete () {
     die "transaction $tx_id does not exist."
   fi
 
-  printf "%s\n\n" "The following transaction will be deleted:"
+  printf "\n%s\n\n" "The following transaction will be deleted:"
   delete_tx
   printf "\n"
   read -rp "Are you sure? (y/n) > "
@@ -167,7 +170,9 @@ finlog_delete () {
   sqlite3 "$DB_PATH/$DB_FILE" "DELETE FROM finlog_data WHERE rowid = $tx_id" \
     || die "unable to delete transaction $tx_id."
 
+  printf "\n"
   log "Transaction $tx_id successfully deleted."
+  printf "\n"
 
 }
 
@@ -181,43 +186,55 @@ finlog_list () {
   
   if (( list_all == 1 )); then
 
+    printf "\n"
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data"
+    printf "\n"
 
   elif (( list_date == 1 )); then
 
+    printf "\n"
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
       WHERE date LIKE '$tx_date'"
+    printf "\n"
 
   elif (( list_amount == 1 )); then
   
+    printf "\n"
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
       WHERE amount LIKE '$tx_amount'"
+    printf "\n"
 
   elif (( list_category == 1 )); then
     
+    printf "\n" 
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
       WHERE category LIKE '$tx_category'"
+    printf "\n"
 
   elif (( list_note == 1 )); then
 
+    printf "\n"
     sqlite3 "${SQLITE_CONFIG[@]}" \
       "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
       WHERE note LIKE '$tx_note'"
-
+    printf "\n"
+  
   fi
 
 }
 
 finlog_summary () {
   
+  printf "\n"
   sqlite3 -cmd ".header on" -cmd ".mode box" -cmd ".width 16 -12" \
     "$DB_PATH/$DB_FILE" "SELECT category AS Category, 'kr ' || printf('%d,%02d',
     SUM(amount) / 100, SUM(amount) % 100) AS Total FROM finlog_data
     GROUP BY category"
+  printf "\n"
 
 }
 
