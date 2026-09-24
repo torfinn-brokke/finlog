@@ -3,7 +3,7 @@
 # finlog: a Bash script for recording and listing personal expenses in a local
 # SQLite database.
 
-set -uo pipefail
+set -u
 
 # --- Configuration ---
 
