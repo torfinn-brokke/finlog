@@ -287,7 +287,7 @@ validate_category () {
 
 validate_category_search () {
   if [[ ! $tx_category =~ ^[[:alnum:]%_]+$ ]]; then
-    die "search allows only alphanumeric characters and '%_'."
+    die "search allows alphanumeric characters and '%_'."
   fi
 }
 
@@ -301,7 +301,7 @@ validate_note () {
 validate_note_search () {
   tx_note="${tx_note:-}"
   if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_%()]+$ ]] && [[ -n $tx_note ]]; then
-    die "search allows only alphanumerics, space and '.,!?:/_%()'."
+    die "search allows alphanumerics, space and '.,!?:/_%()'."
   fi
 }
 validate_tx_id () {
@@ -360,16 +360,17 @@ case "$1" in
             case "$2" in
               all)  list_all=1
                     ;;
-              -d)   list_date=1
-                    tx_date="$3"
+              -d)   tx_date=$(date +"%d.%m.%Y")
+                    list_date=1
+                    tx_date="${3:-$(date +"%d.%m.%Y")}"
                     validate_date
                     ;;
               -a)   list_amount=1
-                    tx_amount="$3"
+                    tx_amount="${3:-}"
                     validate_amount
                     ;;
               -c)   list_category=1
-                    tx_category="$3"
+                    tx_category="${3:-}"
                     validate_category_search
                     ;;
               -n)   list_note=1
