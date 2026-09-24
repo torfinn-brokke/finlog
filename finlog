@@ -31,8 +31,8 @@ usage() {
   echo "  delete    Delete a transaction."
   echo "            Usage: finlog delete transaction_number"
   echo "  list      List all transactions, or list by \
-date/amount/category/notes. \
-Wildcards: '%' and '_'."
+date/amount/category/notes."
+  echo "            Wildcards: '%' and '_'."
   echo "            Usage: finlog list [all] [-d [date]] [-a amount] \
 [-c category] [-n note]"
   echo "  summary   Display the total amount spent per category."
