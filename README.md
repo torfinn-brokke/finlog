@@ -66,18 +66,36 @@ All input is validated. Invalid input will cause the script to exit with a descr
 Here is an example of how to add a transaction, including the optional note:
 
 ```bash
-$ finlog add 09.09.2026 534,60 Groceries -n Bread and milk
-Transaction 126 successfully added: 09.09.2026 - kr 534,60 - Groceries - Bread and milk
+$ finlog add 23.09.2026 1343,43 Groceries -n Bread and milk
+
+[2026-09-24 18:06:56] Transaction successfully added:
+
+┌─────┬────────────┬──────────────┬──────────────────┬───────────────────────────────┐
+│ ID  │    Date    │    Amount    │     Category     │             Note              │
+├─────┼────────────┼──────────────┼──────────────────┼───────────────────────────────┤
+│ 5   │ 2026-09-23 │   kr 1343,43 │ Groceries        │ Bread and milk                │
+└─────┴────────────┴──────────────┴──────────────────┴───────────────────────────────┘
+
 $
 ```
 
 To delete a transaction, use `finlog delete transaction_number` like this:
 
 ```bash
-$ finlog delete 126
-Transaction 126 (09.09.2026 - kr 534,60 - Groceries - Bread and milk) will be deleted.
+$ finlog delete 5
+
+The following transaction will be deleted:
+
+┌─────┬────────────┬──────────────┬──────────────────┬───────────────────────────────┐
+│ ID  │    Date    │    Amount    │     Category     │             Note              │
+├─────┼────────────┼──────────────┼──────────────────┼───────────────────────────────┤
+│ 5   │ 2026-09-24 │    kr 454,43 │ Groceries        │ Snacks                        │
+└─────┴────────────┴──────────────┴──────────────────┴───────────────────────────────┘
+
 Are you sure? (y/n) > y
-Transaction 126 successfully deleted.
+
+[2026-09-24 18:08:00] Transaction 5 successfully deleted.
+
 $
 ```
 
@@ -87,8 +105,8 @@ To list all transactions in the database, or filter the results corresponding to
 $ finlog list             # Lists all transactions added to the database.
 $ finlog list -d [date]   # Only the DD.MM.YYYY format is accepted (no date input = today).
 $ finlog list -a amount   # No spaces, comma as decimal separator, a maximum of two decimals.
-$ finlog list -c category # Wildcards are possible.
-$ finlog list -n note     # Wildcards are possible.
+$ finlog list -c category # Wildcards are possible ('%' matches multiple characters, '_' matches one character).
+$ finlog list -n note     # Wildcards are possible ('%' matches multiple characters, '_' matches one character).
 ```
 
 Listing transactions will also make finlog display the total amount for all items listed. This can be used to display, for example, the total amount spent on a particular date. While it can also be used to display the total amount spent for a particular category, see the `finlog summary` section below.
@@ -96,15 +114,16 @@ Listing transactions will also make finlog display the total amount for all item
 Here is an example lookup:
 
 ```bash
-$ finlog list -c Utilities
-  
-  No. | Date       | Amount        | Category            | Note
----------------------------------------------------------------------------------------
-   14 | 05.08.2026 | kr 1685,43    | Utilities           | Electricity
-   59 | 28.08.2026 | kr 499,00     | Utilities           | Internet
-  102 | 06.09.2026 | kr 560,50     | Utilities           |
+$ finlog list -c Groc%
 
-TOTAL AMOUNT: kr 2744,93
+┌─────┬────────────┬──────────────┬──────────────────┬───────────────────────────────┐
+│ ID  │    Date    │    Amount    │     Category     │             Note              │
+├─────┼────────────┼──────────────┼──────────────────┼───────────────────────────────┤
+│ 1   │ 2026-09-23 │   kr 1343,43 │ Groceries        │ Bread and milk                │
+│ 2   │ 2026-08-20 │    kr 653,03 │ Groceries        │                               │
+└─────┴────────────┴──────────────┴──────────────────┴───────────────────────────────┘
+
+Sum Total: kr 1996,46
 
 $
 ```
@@ -116,14 +135,15 @@ Here is an example of how to use it:
 ```bash
 $ finlog summary
 
-Category            | No. of Transactions |      Total Amount
--------------------------------------------------------------
-Utilities           |                  64 |       kr 16385,03
-Groceries           |                 144 |       kr 38346,50
-Entertainment       |                  13 |        kr 6050,00
-Transportation      |                  22 |        kr 4977,34
+┌──────────────────┬──────────────┐
+│     Category     │    Total     │
+├──────────────────┼──────────────┤
+│ Entertainment    │    kr 745,00 │
+│ Groceries        │   kr 1996,46 │
+│ Utilities        │   kr 1430,00 │
+└──────────────────┴──────────────┘
 
-TOTAL AMOUNT (ALL CATEGORIES): kr 65758,87
+Sum Total: kr 4171,46
 
 $
 ```
