@@ -31,7 +31,8 @@ usage() {
   echo "  delete    Delete a transaction."
   echo "            Usage: finlog delete transaction_number"
   echo "  list      List all transactions, or list by \
-date/amount/category/notes."
+date/amount/category/notes. \
+Wildcards: '%' and '_'."
   echo "            Usage: finlog list [all] [-d [date]] [-a amount] \
 [-c category] [-n note]"
   echo "  summary   Display the total amount spent per category."
@@ -245,6 +246,12 @@ validate_category () {
   fi
 }
 
+validate_category_search () {
+  if [[ ! $tx_category =~ ^[[:alnum:]%_]+$ ]]; then
+    die "search allows only alphanumeric characters and '%_'."
+  fi
+}
+
 validate_note () {
   tx_note="${tx_note:-}"
   if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_()]+$ ]] && [[ -n $tx_note ]]; then
@@ -252,16 +259,33 @@ validate_note () {
   fi
 }
 
+validate_note_search () {
+  tx_note="${tx_note:-}"
+  if [[ ! $tx_note =~ ^[[:alnum:]\ .,!?:/_%()]+$ ]] && [[ -n $tx_note ]]; then
+    die "search allows only alphanumerics, space and '.,!?:/_%()'."
+  fi
+}
 validate_tx_id () {
   if [[ ! $tx_id =~ ^[0-9]+$ ]]; then
     die "invalid transaction number; digits only, no spaces."
   fi
 }
 
+# --- Secondary Argument/Option Validation ---
+
+optval="${2:-}"
+
+optval_check () {
+if [[ -z $optval ]]; then
+  die "missing arguments/options; use '$SCRIPT_NAME -h' for help."
+fi
+}
+
 # --- Argument/Option Parsing ---
 
 case "$1" in
-  add)      shift
+  add)      optval_check
+            shift
             tx_data=("$@")
             if [[ ${tx_data[0]} =~ ^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$ ]]; then
               tx_date="${tx_data[0]}"
@@ -288,11 +312,13 @@ case "$1" in
             validate_note 
             finlog_add
             ;;
-  delete)   tx_id="$2"
+  delete)   optval_check
+            tx_id="$2"
             validate_tx_id
             finlog_delete
             ;;
-  list)     case "$2" in
+  list)     optval_check
+            case "$2" in
               all)  list_all=1
                     ;;
               -d)   list_date=1
@@ -305,12 +331,12 @@ case "$1" in
                     ;;
               -c)   list_category=1
                     tx_category="$3"
-                    validate_category
+                    validate_category_search
                     ;;
               -n)   list_note=1
                     shift 2
                     tx_note="$*"
-                    validate_note
+                    validate_note_search
                     ;;
               *)    die "invalid argument(s); use '$SCRIPT_NAME -h' for help."
                     ;;
