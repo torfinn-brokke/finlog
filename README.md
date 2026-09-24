@@ -105,8 +105,8 @@ To list all transactions in the database, or filter the results corresponding to
 $ finlog list             # Lists all transactions added to the database.
 $ finlog list -d [date]   # Only the DD.MM.YYYY format is accepted (no date input = today).
 $ finlog list -a amount   # No spaces, comma as decimal separator, a maximum of two decimals.
-$ finlog list -c category # Wildcards are possible ('%' matches multiple characters, '_' matches one character).
-$ finlog list -n note     # Wildcards are possible ('%' matches multiple characters, '_' matches one character).
+$ finlog list -c category # Wildcards possible ('%' matches multiple chars, '_' matches one char).
+$ finlog list -n note     # Wildcards possible ('%' matches multiple chars, '_' matches one char).
 ```
 
 Listing transactions will also make finlog display the total amount for all items listed. This can be used to display, for example, the total amount spent on a particular date. While it can also be used to display the total amount spent for a particular category, see the `finlog summary` section below.
