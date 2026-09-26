@@ -25,7 +25,8 @@ log() {
 
 usage() {
   echo "$SCRIPT_NAME: usage:"
-  echo "$SCRIPT_NAME [add|delete|list|summary] [-h]"
+  echo "$SCRIPT_NAME -h displays this help text."
+  echo "$SCRIPT_NAME {add | delete | list | summary}:"
   echo "  add       Add a transaction."
   echo "            Usage: finlog add [date] amount category [-n note]"
   echo "  delete    Delete a transaction."
@@ -33,12 +34,10 @@ usage() {
   echo "  list      List all transactions, or list by \
 date/amount/category/notes."
   echo "            Wildcards: '%' and '_'."
-  echo "            Usage: finlog list [all] [-d [date]] [-a amount] \
-[-c category] [-n note]"
+  echo "            Usage: finlog list {all | -d [date] | -a amount | \
+-c category | -n note}"
   echo "  summary   Display the total amount spent per category."
   echo "            Usage: finlog summary"
-  echo "  -h        Display this help text"
-  echo "            Usage: finlog -h"
 }
 
 # =============================================================================
