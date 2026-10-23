@@ -4,9 +4,16 @@
 
 This is a Bash script for recording and listing personal expenses in a local SQLite database.
 
-> **NOTE:** this has been a learning project for me as part of getting to grips with Bash scripting, SQLite3, and using GitHub. I have made it public in the hope that someone else can make use of it for whatever purpose. Treat it like what it is, though: an experimental learning tool.
+It can do the following:
 
-The code is all written by me, this is not vibe coded. I have used AI heavily as a tutor, though—not to provide me with the finished answer, but to teach me scripting and to make me learn from my mistakes.
+* Add transactions to a local database.
+* Delete transactions by transaction number.
+* List transactions based on various parameters.
+* Provide a summary of all stored transactions by category.
+
+It is currently set up for Norwegian standards (NOK as the currency and the comma (`,`) as decimal separator). finlog is designed for use with Linux, and uses `date -d`, which is GNU-specific, as part of its main logic.
+
+> **NOTE:** this has been a learning project for me as part of getting to grips with Bash scripting, SQLite3, and using GitHub. I have made it public in the hope that someone else can make use of it for whatever purpose. Treat it like what it is, though: an experimental learning tool. The code is all written by me, this is not vibe coded.
 
 ## Requirements
 
@@ -43,6 +50,8 @@ Copy the file `finlog` to your `~/bin` folder:
 ```bash
 $ cp finlog ~/bin/
 ```
+
+> **NOTE:** the above assumes that `~/bin` is in your `$PATH` environment variable. Check it with the command `echo $PATH`. If it is not, you can either add it (using the command `export PATH="$HOME/bin:$PATH"`) or make a symlink into a directory that is already on the path.
 
 Make the file executable:
 
@@ -153,6 +162,10 @@ $
 ```
 
 > **NOTE:** Be careful about spelling the category names the exact same way every time you add a transaction. Otherwise you might end up with, for example, one `Groceries` and one `grocery` category.
+
+To back up the database you can copy the file `~/.local/share/finlog/finlog.db` to a secure location.
+
+To uninstall, remove the script file from where you installed it, and delete the folder `~/.local/share/finlog`.
 
 For help, use:
 
