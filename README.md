@@ -6,7 +6,7 @@ This is a Bash script for recording and listing personal expenses in a local SQL
 
 > **NOTE:** this has been a learning project for me as part of getting to grips with Bash scripting and using GitHub. I have made it public in the hope that someone else can make use of it for whatever purpose. Treat it like what it is, though: an experimental learning tool.
 
-The code is all written by me, this is not vibe coded. I have used AI heavily as a tutor, though−not to provide me with the finished answer, but to teach me scripting and to make me learn from my mistakes.
+The code is all written by me, this is not vibe coded. I have used AI heavily as a tutor, though—not to provide me with the finished answer, but to teach me scripting and to make me learn from my mistakes.
 
 ## Requirements
 
