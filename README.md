@@ -4,6 +4,8 @@
 
 This is a Bash script for recording and listing personal expenses in a local SQLite database.
 
+> **NOTE:** this has been a learning project for me as part of getting to grips with Bash scripting. I have made it public in the hope that someone else can make use of it for whatever purpose. Treat it like what it is, though: an experimental and learning tool.
+
 ## Requirements
 
 finlog requires SQLite3 to be installed on your system.
