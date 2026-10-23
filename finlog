@@ -199,9 +199,12 @@ finlog_list () {
   sum_validation () {
 
     local sum_total
-    sum_total="$(sqlite3 "$DB_PATH/$DB_FILE" "SELECT 'kr ' || printf('%d,%02d',
+    sum_total="$(sqlite3 "$DB_PATH/$DB_FILE" \
+    -cmd ".parameter init" \
+    -cmd ".parameter set @value '$2'" \
+    "SELECT 'kr ' || printf('%d,%02d',
     SUM(amount) / 100, SUM(amount) % 100) FROM finlog_data WHERE $1
-    LIKE '$2'")"
+    LIKE @value")"
   
     if [[ "$sum_total" = 'kr 0,00' ]]; then
       die "no matching transactions."
@@ -224,7 +227,7 @@ finlog_list () {
 
     printf "\n"
     sqlite3 "${SQLITE_CONFIG[@]}" "$DB_PATH/$DB_FILE" \
-      -cmd ".paramter init" \
+      -cmd ".parameter init" \
       -cmd ".parameter set @tx_date '$tx_date'" \
       "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
       WHERE date LIKE @tx_date"
