@@ -157,9 +157,10 @@ finlog_add () {
 finlog_delete () {
 
   delete_tx () {
-    sqlite3 "${SQLITE_CONFIG[@]}" \
-    "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-    WHERE rowid = $tx_id"
+    sqlite3 "${SQLITE_CONFIG[@]}" "$DB_PATH/$DB_FILE" \
+    -cmd ".parameter init" \
+    -cmd ".parameter set @tx_id '$tx_id'" \
+    "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data WHERE rowid = @tx_id"
   }
 
   if [[ -z "$(delete_tx)" ]]; then
@@ -175,7 +176,10 @@ finlog_delete () {
     die "program terminated by user."
   fi
 
-  sqlite3 "$DB_PATH/$DB_FILE" "DELETE FROM finlog_data WHERE rowid = $tx_id" \
+  sqlite3 "$DB_PATH/$DB_FILE" \
+    -cmd ".parameter init" \
+    -cmd ".parameter set @tx_id '$tx_id'" \
+    "DELETE FROM finlog_data WHERE rowid = @tx_id" \
     || die "unable to delete transaction $tx_id."
 
   printf "\n"
@@ -219,36 +223,44 @@ finlog_list () {
   elif (( list_date == 1 )); then
 
     printf "\n"
-    sqlite3 "${SQLITE_CONFIG[@]}" \
-      "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-      WHERE date LIKE '$tx_date'"
+    sqlite3 "${SQLITE_CONFIG[@]}" "$DB_PATH/$DB_FILE" \
+      -cmd ".paramter init" \
+      -cmd ".parameter set @tx_date '$tx_date'" \
+      "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
+      WHERE date LIKE @tx_date"
 
       sum_validation date "$tx_date"
 
   elif (( list_amount == 1 )); then
   
     printf "\n"
-    sqlite3 "${SQLITE_CONFIG[@]}" \
-      "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-      WHERE amount LIKE '$tx_amount'"
-
+    sqlite3 "${SQLITE_CONFIG[@]}" "$DB_PATH/$DB_FILE" \
+      -cmd ".parameter init" \
+      -cmd ".parameter set @tx_amount '$tx_amount'" \
+      "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
+      WHERE amount LIKE @tx_amount"
+    
       sum_validation amount "$tx_amount"
 
   elif (( list_category == 1 )); then
     
     printf "\n" 
-    sqlite3 "${SQLITE_CONFIG[@]}" \
-      "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-      WHERE category LIKE '$tx_category'"
+    sqlite3 "${SQLITE_CONFIG[@]}" "$DB_PATH/$DB_FILE" \
+      -cmd ".parameter init" \
+      -cmd ".parameter set @tx_category '$tx_category'" \
+      "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
+      WHERE category LIKE @tx_category"
 
     sum_validation category "$tx_category"
 
   elif (( list_note == 1 )); then
 
     printf "\n"
-    sqlite3 "${SQLITE_CONFIG[@]}" \
-      "$DB_PATH/$DB_FILE" "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
-      WHERE note LIKE '$tx_note'"
+    sqlite3 "${SQLITE_CONFIG[@]}" "$DB_PATH/$DB_FILE" \
+      -cmd ".parameter init" \
+      -cmd ".parameter set @tx_note '$tx_note'" \
+      "SELECT $SQLITE_OUTPUT_FORMAT FROM finlog_data
+      WHERE note LIKE @tx_note"
 
     sum_validation note "$tx_note"
 
