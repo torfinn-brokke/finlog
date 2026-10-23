@@ -1,8 +1,8 @@
 # finlog
 
-This is a Bash script for recording and listing personal expenses in a local SQLite database.
+[![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)[![License](https://img.shields.io/github/license/torfinn-brokke/finlog)](https://github.com/torfinn-brokke/finlog/blob/main/LICENSE)[![Last Commit](https://img.shields.io/github/last-commit/torfinn-brokke/finlog)](https://github.com/torfinn-brokke/finlog/commits/main)[![ShellCheck](https://github.com/torfinn-brokke/finlog/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/torfinn-brokke/finlog/actions/workflows/shellcheck.yml)
 
-> **Status:** Learning / experimental
+This is a Bash script for recording and listing personal expenses in a local SQLite database.
 
 ## Requirements
 
