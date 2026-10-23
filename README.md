@@ -108,7 +108,7 @@ To list all transactions in the database, or filter the results corresponding to
 ```bash
 $ finlog list all         # Lists all transactions added to the database.
 $ finlog list -d [date]   # Only the DD.MM.YYYY format is accepted (no date input = today).
-$ finlog list -a amount   # No spaces, comma as decimal separator, a maximum of two decimals.
+$ finlog list -a amount   # No spaces, comma as decimal separator, maximum of two decimals.
 $ finlog list -c category # Wildcards: '%' matches multiple chars, '_' matches one char.
 $ finlog list -n note     # Wildcards: '%' matches multiple chars, '_' matches one char.
 ```
