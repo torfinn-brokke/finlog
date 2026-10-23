@@ -123,14 +123,23 @@ add_note=0
 finlog_add () {
 
   if [[ "$add_note" == 0 ]]; then
-    sqlite3 "$DB_PATH/$DB_FILE" "INSERT INTO finlog_data (
-    date, amount, category)
-    VALUES ('$tx_date', $tx_amount,'$tx_category')" \
+    sqlite3 "$DB_PATH/$DB_FILE" \
+    -cmd ".parameter init" \
+    -cmd ".parameter set @tx_date '$tx_date'" \
+    -cmd ".parameter set @tx_amount '$tx_amount'" \
+    -cmd ".parameter set @tx_category '$tx_category'" \
+    "INSERT INTO finlog_data (date, amount, category)
+    VALUES (@tx_date, @tx_amount, @tx_category);" \
       || die "unable to write to database file $DB_PATH/$DB_FILE."
   else
-    sqlite3 "$DB_PATH/$DB_FILE" "INSERT INTO finlog_data (
-    date, amount, category, note)
-    VALUES ('$tx_date', $tx_amount,'$tx_category','$tx_note')" \
+    sqlite3 "$DB_PATH/$DB_FILE" \
+    -cmd ".parameter init" \
+    -cmd ".parameter set @tx_date '$tx_date'" \
+    -cmd ".parameter set @tx_amount '$tx_amount'" \
+    -cmd ".parameter set @tx_category '$tx_category'" \
+    -cmd ".parameter set @tx_note '$tx_note'" \
+    "INSERT INTO finlog_data (date, amount, category, note)
+    VALUES (@tx_date, @tx_amount, @tx_category, @tx_note);" \
       || die "unable to write to database file $DB_PATH/$DB_FILE."
   fi
   
