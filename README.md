@@ -11,9 +11,9 @@ It can do the following:
 * List transactions with optional filters (date, amount, category, and/or notes).
 * Provide a summary of all stored transactions by category.
 
-It is currently set up for Norwegian standards (NOK as the currency and the comma (`,`) as decimal separator). finlog is designed for use with Linux, and uses `date -d`, which is GNU-specific, as part of its main logic.
+It is currently set up for Norwegian standards (DD.MM.YYYY date format, NOK as the currency and the comma (`,`) as decimal separator). finlog is designed for use with Linux, and uses `date -d`, which is GNU-specific, as part of its main logic.
 
-> **NOTE:** this has been a learning project for me as part of getting to grips with Bash scripting, SQLite3, and using GitHub. Treat it like what it is, though: an experimental learning tool.
+> **NOTE:** this has been a learning project for me as part of getting to grips with Bash scripting, SQLite3, and using GitHub. Treat it like what it is: an experimental learning tool.
 
 ## Requirements
 
