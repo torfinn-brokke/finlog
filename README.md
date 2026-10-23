@@ -15,7 +15,7 @@ finlog requires SQLite3 to be installed on your system.
 To check whether it is already installed, run the following command:
 
 ```bash
-$ which sqlite3
+$ command -v sqlite3
 ```
 
 If it is already installed, this command will indicate where it is installed, commonly `/usr/bin/sqlite3`. If the command returns nothing, you do not have SQLite3 installed.
