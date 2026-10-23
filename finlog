@@ -74,7 +74,7 @@ esac
 
 # --- Dependency Check ---
 
-if ! which sqlite3 >&2 >/dev/null; then
+if ! command -v sqlite3 >&2 >/dev/null; then
   die "SQLite3 not installed."
 fi
 
