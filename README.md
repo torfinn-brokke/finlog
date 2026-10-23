@@ -8,7 +8,7 @@ It can do the following:
 
 * Add transactions to a local database.
 * Delete transactions by transaction number.
-* List transactions with optional filters (date, amount category, and/or notes).
+* List transactions with optional filters (date, amount, category, and/or notes).
 * Provide a summary of all stored transactions by category.
 
 It is currently set up for Norwegian standards (NOK as the currency and the comma (`,`) as decimal separator). finlog is designed for use with Linux, and uses `date -d`, which is GNU-specific, as part of its main logic.
